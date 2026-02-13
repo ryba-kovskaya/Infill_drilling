@@ -167,23 +167,24 @@ def get_save_path(program_name: str = "default") -> str:
     path_program = os.getcwd()
     current_datetime = datetime.now().strftime("%d.%m.%Y")
     # Проверка возможности записи в директорию программы
-    if os.access(path_program, os.W_OK):
-        if "\\app" in path_program:
-            path_program = path_program.replace("\\app", "")
-        if "\\drill_zones" in path_program:
-            path_program = path_program.replace("\\drill_zones", "")
-        save_path = f"{path_program}\\output\\{current_datetime}"
-    else:
+    if "\\app" in path_program:
+        path_program = path_program.replace("\\app", "")
+    if "\\drill_zones" in path_program:
+        path_program = path_program.replace("\\drill_zones", "")
+    save_path = f"{path_program}\\output\\{current_datetime}"
+    try:
+        create_new_dir(save_path)
+    except PermissionError:
         # Поиск другого диска с возможностью записи: D: если он есть и C:, если он один
         # В будущем можно исправить с запросом на сохранение
         drives = win32api.GetLogicalDriveStrings()  # получение списка дисков
         save_drive = []
         list_drives = [drive for drive in drives.split('\\\000')[:-1] if 'D:' in drive]
-        if len(list_drives) >= 1:
+        if list_drives:
             save_drive = list_drives[0]
         else:
             list_drives = [drive for drive in drives.split('\\\000')[:-1] if 'C:' in drive]
-            if len(list_drives) >= 1:
+            if list_drives:
                 save_drive = list_drives[0]
             else:
                 error_msg = f"У пользователя нет прав доступа на запись на диск {save_drive}"
@@ -199,8 +200,7 @@ def get_save_path(program_name: str = "default") -> str:
         else:
             save_path = (f"{save_drive}\\{profile_dir[0]}\\{current_user}\\"
                          f"{program_name}_output\\{current_datetime}")
-
-    create_new_dir(save_path)
+        create_new_dir(save_path)
     return save_path
 
 
