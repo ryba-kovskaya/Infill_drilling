@@ -274,6 +274,7 @@ def calculate_effective_radius(data_wells, dict_properties, is_exe=False):
     df_parameters_voronoi = get_parameters_voronoi_cells(data_wells_work)
 
     # Оценка объемов полезной закачки для нагнетательных скважин
+    del data_wells['V_useful_injection']
     data_wells = calculate_useful_injection(data_wells, is_exe=is_exe)
 
     # расчет радиусов по физическим параметрам
@@ -290,7 +291,6 @@ def calculate_effective_radius(data_wells, dict_properties, is_exe=False):
     data_wells = voronoi_normalize_r_eff(data_wells, df_parameters_voronoi)
     del data_wells['Bo']
     del data_wells['rho']
-    del data_wells['V_useful_injection']
     return data_wells
 
 
